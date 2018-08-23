@@ -12,7 +12,6 @@
 #include "Newton.hh"
 #include "QuasiNewton.hh"
 #include "Constrained_Min.hh"
-#include "UnConstrained_Min.hh"
 #include "MPI_helpers.hh"
 #include "Dense_Matrix.hh"
 
@@ -51,20 +50,14 @@ main (int argc, char * argv[]){
   // h = 0
   FunctionRn h;
   Monomial h_mon1 (1,{1,0});
-
-
   h.addMonomial (h_mon1);
 
 
   // g >= 0, g <= 0;
   FunctionRn g1, g2;
   Monomial g1_mon1 (1,{1,0});
-
   g1.addMonomial (g1_mon1);
-
-
   Monomial g2_mon1 (-1,{1,0});
-
   g2.addMonomial (g2_mon1);
 
 
@@ -89,9 +82,13 @@ main (int argc, char * argv[]){
 
   // Optimization
 
-  Constrained_Min<Newton<FunctionRn_Constrained>> solver_Newton (penal, 500, 100, 1e-5);
-  Constrained_Min<QuasiNewton<FunctionRn_Constrained>> solver_quasiN (penal, Id, 500, 100, 1e-5);
-  Constrained_Min<GradientDescent<FunctionRn_Constrained>> solver_grad (penal, 500, 100, 1e-5);
+  Newton<FunctionRn_Constrained> newton_method (penal, 100);
+  QuasiNewton<FunctionRn_Constrained> quasiN_method  (penal, Id, 100);
+  GradientDescent<FunctionRn_Constrained> grad_method (penal, 100);
+
+  Constrained_Min<Newton<FunctionRn_Constrained>> solver_Newton (newton_method, 500, 1e-5);
+  Constrained_Min<QuasiNewton<FunctionRn_Constrained>> solver_quasiN (quasiN_method,  500, 1e-5);
+  Constrained_Min<GradientDescent<FunctionRn_Constrained>> solver_grad (grad_method,  500, 1e-5);
 
   //----------------------SEQUENTIAL-----------------------------------------------------------------------
 
@@ -130,39 +127,39 @@ main (int argc, char * argv[]){
   }
 
   //----------------------PARALLEL-----------------------------------------------------------------------
-  //
-  // unsigned n_trials = 10;
-  //
-  // std::pair<Point, unsigned> x_Newton_multistart = solver_Newton.minimize_multistart (n_trials, {-2, -2}, {2, 2});
-  // std::pair<Point, unsigned> x_quasiN_multistart = solver_quasiN.minimize_multistart (n_trials, {-2, -2}, {2, 2});
-  // std::pair<Point, unsigned> x_grad_multistart = solver_grad.minimize_multistart (n_trials, {-2, -2}, {2, 2});
-  //
-  // if(mpi::rank () == 0)
-  // {
-  //   std::cout << "-------------PARALLEL-----------------------------------------------------------" << '\n';
-  //   std::cout << "n_trials = " << n_trials << '\n';
-  //   std::cout << "--------------------------------------------------------------------------------" << '\n';
-  //   std::cout << "-------------Newton-------------------------------------------------------------" << '\n';
-  //   std::cout << "--------------------------------------------------------------------------------" << '\n';
-  //   std::cout << "-x_min      = " << x_Newton_multistart.first << '\n';
-  //   std::cout << "-iterations = " << x_Newton_multistart.second << '\n';
-  //   std::cout << "-g1(x_min)  = " << g1.eval (x_Newton_multistart.first) << std::endl;
-  //   std::cout << "-g2(x_min)  = " << g2.eval (x_Newton_multistart.first) << std::endl;
-  //   std::cout << "--------------------------------------------------------------------------------" << '\n';
-  //   std::cout << "-------------QuasiNewton--------------------------------------------------------" << '\n';
-  //   std::cout << "--------------------------------------------------------------------------------" << '\n';
-  //   std::cout << "-x_min      = " << x_quasiN_multistart.first << '\n';
-  //   std::cout << "-iterations = " << x_quasiN_multistart.second << '\n';
-  //   std::cout << "-g1(x_min)  = " << g1.eval (x_quasiN_multistart.first) << std::endl;
-  //   std::cout << "-g2(x_min)  = " << g2.eval (x_quasiN_multistart.first) << std::endl;
-  //   std::cout << "--------------------------------------------------------------------------------" << '\n';
-  //   std::cout << "-------------Gradient-----------------------------------------------------------" << '\n';
-  //   std::cout << "--------------------------------------------------------------------------------" << '\n';
-  //   std::cout << "-x_min      = " << x_grad_multistart.first << '\n';
-  //   std::cout << "-iterations = " << x_grad_multistart.second << '\n';
-  //   std::cout << "-g1(x_min)  = " << g1.eval (x_grad_multistart.first) << std::endl;
-  //   std::cout << "-g2(x_min)  = " << g2.eval (x_grad_multistart.first) << std::endl;
-  // }
+
+  unsigned n_trials = 10;
+
+  std::pair<Point, unsigned> x_Newton_multistart = solver_Newton.minimize_multistart (n_trials, {-2, -2}, {2, 2});
+  std::pair<Point, unsigned> x_quasiN_multistart = solver_quasiN.minimize_multistart (n_trials, {-2, -2}, {2, 2});
+  std::pair<Point, unsigned> x_grad_multistart = solver_grad.minimize_multistart (n_trials, {-2, -2}, {2, 2});
+
+  if(mpi::rank () == 0)
+  {
+    std::cout << "-------------PARALLEL-----------------------------------------------------------" << '\n';
+    std::cout << "n_trials = " << n_trials << '\n';
+    std::cout << "--------------------------------------------------------------------------------" << '\n';
+    std::cout << "-------------Newton-------------------------------------------------------------" << '\n';
+    std::cout << "--------------------------------------------------------------------------------" << '\n';
+    std::cout << "-x_min      = " << x_Newton_multistart.first << '\n';
+    std::cout << "-iterations = " << x_Newton_multistart.second << '\n';
+    std::cout << "-g1(x_min)  = " << g1.eval (x_Newton_multistart.first) << std::endl;
+    std::cout << "-g2(x_min)  = " << g2.eval (x_Newton_multistart.first) << std::endl;
+    std::cout << "--------------------------------------------------------------------------------" << '\n';
+    std::cout << "-------------QuasiNewton--------------------------------------------------------" << '\n';
+    std::cout << "--------------------------------------------------------------------------------" << '\n';
+    std::cout << "-x_min      = " << x_quasiN_multistart.first << '\n';
+    std::cout << "-iterations = " << x_quasiN_multistart.second << '\n';
+    std::cout << "-g1(x_min)  = " << g1.eval (x_quasiN_multistart.first) << std::endl;
+    std::cout << "-g2(x_min)  = " << g2.eval (x_quasiN_multistart.first) << std::endl;
+    std::cout << "--------------------------------------------------------------------------------" << '\n';
+    std::cout << "-------------Gradient-----------------------------------------------------------" << '\n';
+    std::cout << "--------------------------------------------------------------------------------" << '\n';
+    std::cout << "-x_min      = " << x_grad_multistart.first << '\n';
+    std::cout << "-iterations = " << x_grad_multistart.second << '\n';
+    std::cout << "-g1(x_min)  = " << g1.eval (x_grad_multistart.first) << std::endl;
+    std::cout << "-g2(x_min)  = " << g2.eval (x_grad_multistart.first) << std::endl;
+  }
 
   MPI_Finalize ();
   return 0;

@@ -6,12 +6,10 @@
 #include "Point.hh"
 #include "Monomial.hh"
 #include "FunctionRn.hh"
-#include "FunctionRn_Constrained.hh"
 #include "GradientDescent.hh"
 #include "Newton.hh"
 #include "QuasiNewton.hh"
-#include "Constrained_Min.hh"
-#include "UnConstrained_Min.hh"
+#include "Unconstrained_Min.hh"
 #include "MPI_helpers.hh"
 #include "Dense_Matrix.hh"
 
@@ -72,10 +70,13 @@ main (int argc, char *argv[]){
   Point P0 ({1.2, .2});
 
   // Optimization
+  Newton<FunctionRn> newton_method (f, 100, 1e-5); // For tolerance there is a default
+  QuasiNewton<FunctionRn> quasiN_method (f, Id, 100, 1e-5);
+  GradientDescent<FunctionRn> grad_method (f, 100, 1e-5);
 
-  Unconstrained_Min<Newton<FunctionRn>> solver_Newton (f, 100, 1e-5);
-  Unconstrained_Min<QuasiNewton<FunctionRn>> solver_quasiN (f, Id, 100, 1e-5);
-  Unconstrained_Min<GradientDescent<FunctionRn>> solver_grad (f, 100, 1e-5);
+  Unconstrained_Min<Newton<FunctionRn>> solver_Newton (newton_method);
+  Unconstrained_Min<QuasiNewton<FunctionRn>> solver_quasiN (quasiN_method);
+  Unconstrained_Min<GradientDescent<FunctionRn>> solver_grad (grad_method);
 
   //----------------------SEQUENTIAL-----------------------------------------------------------------------
 

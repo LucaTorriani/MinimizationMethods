@@ -19,25 +19,8 @@ class Constrained_Min : public Policy
   double tolerance_constr;
 
 public:
-  // Constructor for optimization using GradientDescent or Newton method.
-  // Receives as argument an object of type FunctionRn_Constrained that contains
-  // the function to be minimized and the constraints, the maximum number
-  // of iterations (max_it) of the constrained optimization method, the maximum
-  // number of iterations (max_it_P) of the unconstrained optimization method,
-  // and the tolerance of the constrained optimization method
-  Constrained_Min (const FunctionRn_Constrained & func,  unsigned max_it_constr,
-                  unsigned max_it_descent, double tol = 1e-5)
-    : Policy (func, max_it_descent), max_iter_constr (max_it_constr), tolerance_constr (tol) {};
-
-  // Constructor for optimization using QuasiNewton methods.
-  // Receives as argument an object of type FunctionRn_Constrained that contains
-  // the function to be minimized and the constraints, an approximation (QuasiNewton),
-  // the maximum number of iterations (max_it) of the constrained optimization method,
-  // the maximum number of iterations (max_it_P) of the unconstrained optimization method,
-  // and the tolerance of the constrained optimization method
-  Constrained_Min (const FunctionRn_Constrained & func, const la::Dense_Matrix & H0_inv,
-                  unsigned max_it_constr, unsigned max_it_descent , double tol = 1e-5)
-    : Policy (func, H0_inv, max_it_descent), max_iter_constr (max_it_constr), tolerance_constr (tol) {};
+  Constrained_Min (const Policy & p , unsigned max_it_constr, double tol = 1e-5)
+    : Policy (p), max_iter_constr (max_it_constr), tolerance_constr (tol) {};
 
   // Minimizes the function func
   // starting from the initial point P0 and calling the Policy method Policy::solve(P0).

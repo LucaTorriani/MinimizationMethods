@@ -11,7 +11,6 @@
 #include "Newton.hh"
 #include "QuasiNewton.hh"
 #include "Constrained_Min.hh"
-#include "UnConstrained_Min.hh"
 #include "MPI_helpers.hh"
 #include "Dense_Matrix.hh"
 
@@ -90,16 +89,19 @@ main (int argc, char *argv[]){
   Point P0 ({1.2, 0.2});
 
   // Optimization
+  Newton<FunctionRn_Constrained> newton_method (penal, 100); // For tolerance there is a default
+  QuasiNewton<FunctionRn_Constrained> quasiN_method  (penal, Id, 100);
+  GradientDescent<FunctionRn_Constrained> grad_method (penal, 100);
 
-  Constrained_Min<Newton<FunctionRn_Constrained>> solver_Newton (penal, 100, 100, 1e-5);
-  Constrained_Min<QuasiNewton<FunctionRn_Constrained>> solver_quasiN (penal, Id, 100, 100, 1e-5);
-  Constrained_Min<GradientDescent<FunctionRn_Constrained>> solver_grad (penal, 100, 100, 1e-5);
+  Constrained_Min<Newton<FunctionRn_Constrained>> solver_Newton (newton_method, 100, 1e-5);
+  Constrained_Min<QuasiNewton<FunctionRn_Constrained>> solver_quasiN (quasiN_method,  100, 1e-5);
+  Constrained_Min<GradientDescent<FunctionRn_Constrained>> solver_grad (grad_method,  100, 1e-5);
 
   ////----------------------SEQUENTIAL-----------------------------------------------------------------------
 
-  std::pair<Point, unsigned> x_Newton =solver_Newton.minimize (P0);
-  std::pair<Point, unsigned> x_quasiN =solver_quasiN.minimize (P0);
-  std::pair<Point, unsigned> x_grad =solver_grad.minimize (P0);
+  std::pair<Point, unsigned> x_Newton = solver_Newton.minimize (P0);
+  std::pair<Point, unsigned> x_quasiN = solver_quasiN.minimize (P0);
+  std::pair<Point, unsigned> x_grad = solver_grad.minimize (P0);
 
   if(mpi::rank () == 0)
   {

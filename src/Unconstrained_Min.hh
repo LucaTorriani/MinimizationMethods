@@ -19,19 +19,7 @@ class Unconstrained_Min : public Policy
 
 public:
 
-  // Constructor for optimization using GradientDescent or Newton method.
-  // Receives as argument the function fun to be minimized, the maximum number
-  // of iterations and the tolerance of the unconstrained optimization method
-  Unconstrained_Min (const FunctionRn & fun, unsigned max_it, double tol = 1e-5)
-    : Policy (fun, max_it, tol) {};
-
-  // Constructor for optimization using QuasiNewton methods.
-  // Receives as argument the function fun to be minimized, the approximation
-  // of Hessian matrix, the maximum number of iterations and the tolerance
-  // of the unconstrained optimization method
-  Unconstrained_Min (const FunctionRn & fun, const la::Dense_Matrix & H0_inv,
-                     unsigned max_it, double tol = 1e-5)
-    : Policy (fun, H0_inv,  max_it, tol) {};
+  Unconstrained_Min (const Policy & p): Policy (p) {};
 
   // Minimizes the function fun
   // starting from the initial point P0 and calling the Policy method Policy::solve(P0).
@@ -41,7 +29,7 @@ public:
   minimize (const Point & P0) const;
 
   // Minimize_multistart is thought to be used in parallel.
-  // It minimizes the function fun 
+  // It minimizes the function fun
   // starting from a sequence of random points whose number is passed as
   // argument in n_trials. The sequence of random points is generated inside the square
   // [x1, x2] x [y1, y2]; the vector inf_limits passed as argument contains the
