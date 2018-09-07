@@ -8,7 +8,7 @@ CXXFLAGS += -Wall -std=c++11 -pedantic -Wextra
 MPIFLAGS += -np 1
 
 OBJS = Monomial.o Point.o Dense_Matrix.o Linear_System.o FunctionRn.o FunctionRn_Constrained.o MPI_helpers.o
-OBJS_MAIN = main_7_15.o main_7_18.o main_beale main_h main_rosenbrock main_rosenbrock2
+OBJS_MAIN = main_7_15.o main_7_18.o main_beale.o main_h.o main_rosenbrock.o main_rosenbrock2.o
 HEADERS_CONSTR = Point.hh Monomial.hh FunctionRn.hh FunctionRn_Constrained.hh Dense_Matrix.hh MPI_helpers.hh GradientDescent.hh Newton.hh QuasiNewton.hh Constrained_Min.hh Backtrack.hh
 HEADERS_UNCONSTR = Point.hh Monomial.hh FunctionRn.hh Dense_Matrix.hh MPI_helpers.hh GradientDescent.hh Newton.hh QuasiNewton.hh Unconstrained_Min.hh Backtrack.hh
 
